@@ -12,7 +12,8 @@ class MLPNN(nn.Module):
     ):
         super(MLPNN, self).__init__()
 
+        self.flatten = nn.Flatten()
         self.mlp_nn = torchvision.ops.MLP(in_features, hidden_sizes)
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.mlp_nn(x)
+        return self.mlp_nn(self.flatten(x))
