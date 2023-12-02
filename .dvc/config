@@ -1,0 +1,6 @@
+[core]
+    remote = mnist
+['remote "mnist_data"']
+    url = gdrive://1VYIOXv47f29qrvTc_OcqPWB-bwPHvi0G
+['remote "mnist"']
+    url = gdrive://1VYIOXv47f29qrvTc_OcqPWB-bwPHvi0G

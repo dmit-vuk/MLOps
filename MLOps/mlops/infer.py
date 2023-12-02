@@ -1,22 +1,51 @@
+from typing import Tuple
+
 import pandas as pd
 import torch
-from models import MLPNN
+from hydra import compose, initialize
 from torch import nn
-from train import evaluate, get_dataloader
+from torch.utils.data import DataLoader
 
-if __name__ == "__main__":
-    test_loader = get_dataloader(batch_size=512, train=False)
+from .data import MnistData
+from .models import MLPNN
 
-    model = MLPNN(in_features=784, hidden_sizes=[1024, 512, 128, 10])
-    model.load_state_dict(torch.load("best_params.pth"))
-    loss = nn.CrossEntropyLoss()
-    test_loss, test_acc, y_pred, y_true = evaluate(
-        dataloader=test_loader, model=model, loss_fn=loss, device="cpu"
+
+def evaluate(dataloader: DataLoader, model: nn.Module) -> Tuple[float]:
+    model.eval()
+    y_pred, y_true = torch.Tensor(), torch.Tensor()
+    with torch.no_grad():
+        for idx, data in enumerate(dataloader):
+            images, labels = data
+            outputs = model(images)
+
+            _, predicted = torch.max(outputs.data, 1)
+            y_pred = torch.cat([y_pred, predicted.cpu()])
+            y_true = torch.cat([y_true, labels.cpu()])
+
+    return (
+        y_pred,
+        y_true,
     )
-    print("Test loss: ", test_loss)
-    print("Test accuracy: ", test_acc.item())
 
+
+def infer():
+    initialize(version_base="1.3", config_path="../configs")
+    config = compose("config.yaml")
+
+    data_module = MnistData(batch_size=config.training.batch_size)
+    model = MLPNN(
+        in_features=config.model.in_features,
+        hidden_sizes=config.model.hidden_sizes,
+    )
+    model.load_state_dict('model.pth')
+    val_dataloader = data_module.train_dataloader()
+
+    y_pred, y_true = evaluate(val_dataloader, model)
     y_pred = y_pred.numpy()
     y_true = y_true.numpy()
     df = pd.DataFrame({"true": y_true, "pred": y_pred})
     df.to_csv("predictions.csv", index=False)
+
+
+if __name__ == "__main__":
+    infer()

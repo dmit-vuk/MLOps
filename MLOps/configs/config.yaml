@@ -1,0 +1,22 @@
+model:
+    name: MLPNN
+    save_dir: /
+    in_features: 784
+    hidden_sizes: [1024, 512, 128, 10]
+
+training:
+    batch_size: 512
+    epochs: 10
+    learning_rate: 3e-4
+
+artifacts:
+    experiment_name: example-experiment
+    log_uri: "file:./logs"
+    mlflow_server_address: "http://127.0.0.1:5000"
+    checkpoint:
+        use: false
+        dirpath: checkpoints
+        filename: "{epoch:02d}-{val_loss:.4f}"
+        monitor: val_loss
+        save_top_k: 1
+        every_n_epochs: 1

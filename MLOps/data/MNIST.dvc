@@ -1,0 +1,6 @@
+outs:
+- md5: eacd27765e790d22d67fc9e973786231.dir
+  size: 66550918
+  nfiles: 9
+  hash: md5
+  path: MNIST
