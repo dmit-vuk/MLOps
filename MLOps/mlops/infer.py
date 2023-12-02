@@ -28,7 +28,7 @@ def evaluate(dataloader: DataLoader, model: nn.Module) -> Tuple[float]:
     )
 
 
-def infer():
+def infer_model():
     initialize(version_base="1.3", config_path="../configs")
     config = compose("config.yaml")
 
@@ -37,7 +37,7 @@ def infer():
         in_features=config.model.in_features,
         hidden_sizes=config.model.hidden_sizes,
     )
-    model.load_state_dict('model.pth')
+    model.load_state_dict(torch.load('model.pth'))
     val_dataloader = data_module.train_dataloader()
 
     y_pred, y_true = evaluate(val_dataloader, model)
@@ -48,4 +48,4 @@ def infer():
 
 
 if __name__ == "__main__":
-    infer()
+    infer_model()

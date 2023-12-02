@@ -52,7 +52,7 @@ class TrainerModule(pl.LightningModule):
     def configure_optimizers(self):
         """Define optimizers and LR schedulers."""
         optimizer = torch.optim.Adam(
-            self.model.parameters(), lr=self.lr, weight_decay=self.weight_decay
+            self.model.parameters(), lr=self.learning_rate
         )
         return optimizer
 
@@ -62,8 +62,7 @@ class TrainerModule(pl.LightningModule):
 
 def load_data(url: str = './..'):
     fs = api.DVCFileSystem(url, rev='main')
-    print(fs.find('/', detail=False, dvc_only=True))
-    fs.get("../data", "./data", recursive=True)
+    fs.get("./MLOps/data", "./", recursive=True, download=True)
 
 
 def train_model():
