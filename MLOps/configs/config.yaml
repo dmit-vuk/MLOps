@@ -11,7 +11,7 @@ model_parameters:
     learning_rate: 3e-4
 
 artifacts:
-    experiment_name: example-experiment
+    experiment_name: mlops_mnist
     log_uri: "file:./logs"
     mlflow_server_address: "http://127.0.0.1:5000"
     checkpoint:

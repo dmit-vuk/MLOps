@@ -60,25 +60,26 @@ class TrainerModule(pl.LightningModule):
         torch.save(self.model.state_dict(), filename)
 
 
-def load_data(url: str = '../'):
+def train_model():
+    url = 'https://github.com/dmit-vuk/MLOps'
     fs = api.DVCFileSystem(url, rev='main')
     fs.get("./MLOps/data", "./", recursive=True, download=True)
-
-
-def train_model():
-    load_data()
     initialize(version_base="1.3", config_path="../configs")
     config = compose("config.yaml")
-    repo = git.Repo(search_parent_directories=True)
+    try:
+        repo = git.Repo(search_parent_directories=True)
+        git_commit_id = repo.head.object.hexsha
+    except git.InvalidGitRepositoryError:
+        git_commit_id = "not a git repo"
 
     data_module = MnistData(batch_size=config.model_parameters.batch_size)
-    train_module = TrainerModule(config, git_commit_id=repo.head.object.hexsha)
+    train_module = TrainerModule(config, git_commit_id=git_commit_id)
 
     logger = pl.loggers.MLFlowLogger(
         experiment_name=config.artifacts.experiment_name,
         tracking_uri=config.artifacts.log_uri,
-        # save_dir = "./logs/mlruns"
     )
+
     trainer = pl.Trainer(
         accelerator='cpu',
         devices=1,
