@@ -19,7 +19,7 @@ class TrainerModule(pl.LightningModule):
         )
 
         self.loss = torch.nn.CrossEntropyLoss()
-        self.learning_rate = conf.training.learning_rate
+        self.learning_rate = conf.model_parameters.learning_rate
 
     def training_step(self, batch, batch_idx):
         images, labels = batch
@@ -60,7 +60,7 @@ class TrainerModule(pl.LightningModule):
         torch.save(self.model.state_dict(), filename)
 
 
-def load_data(url: str = './..'):
+def load_data(url: str = '../'):
     fs = api.DVCFileSystem(url, rev='main')
     fs.get("./MLOps/data", "./", recursive=True, download=True)
 
@@ -71,7 +71,7 @@ def train_model():
     config = compose("config.yaml")
     repo = git.Repo(search_parent_directories=True)
 
-    data_module = MnistData(batch_size=config.training.batch_size)
+    data_module = MnistData(batch_size=config.model_parameters.batch_size)
     train_module = TrainerModule(config, git_commit_id=repo.head.object.hexsha)
 
     logger = pl.loggers.MLFlowLogger(
@@ -82,7 +82,7 @@ def train_model():
     trainer = pl.Trainer(
         accelerator='cpu',
         devices=1,
-        max_epochs=config.training.epochs,
+        max_epochs=config.model_parameters.epochs,
         logger=logger,
     )
 
@@ -91,7 +91,24 @@ def train_model():
     trainer.fit(train_module, train_dataloader, val_dataloader)
 
     # loss_history, acc_history = trainer.train(batch_size=64, epch_num=32)
-    train_module.save_model('model.pth')
+    train_module.save_model(config.model.model_path)
+
+    train_module.model.eval()
+    test_input = torch.ones((1, 784))
+    torch.onnx.export(
+        train_module.model,
+        test_input,
+        config.model.model_path_onnx,
+        export_params=True,
+        # opset_version=15,
+        # do_constant_folding=True,
+        input_names=["images"],
+        output_names=["probas"],
+        dynamic_axes={
+            "images": {0: "BATCH_SIZE"},
+            "probas": {0: "BATCH_SIZE"},
+        },
+    )
 
 
 if __name__ == "__main__":

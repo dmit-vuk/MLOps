@@ -1,10 +1,11 @@
 model:
     name: MLPNN
-    save_dir: /
     in_features: 784
     hidden_sizes: [1024, 512, 128, 10]
+    model_path: "model.pth"
+    model_path_onnx: "model.onnx"
 
-training:
+model_parameters:
     batch_size: 512
     epochs: 10
     learning_rate: 3e-4
