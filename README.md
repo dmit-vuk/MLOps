@@ -3,5 +3,7 @@
 В директории data хранятся данные в dvc формате. В директории configs конфиги для параметров обучения сети. В директории mlops хранятся основные файлы для обучения и тестирования модели.
 
 python commands.py train - обучение и сохранение модели в формате .pt и .onnx
+
 python commands.py infer - infer модели, сохраненной в .pth
+
 python .\commands.py run_server - infer модели, сохраненной в .onnx
