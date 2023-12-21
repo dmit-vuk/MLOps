@@ -2,6 +2,7 @@ import fire
 
 from mlops import infer as infer_module
 from mlops import train as train_module
+from mlops import triton_client
 
 
 def train():
@@ -14,6 +15,10 @@ def infer():
 
 def run_server():
     infer_module.infer_model_onnx()
+
+
+def run_triton():
+    triton_client.test()
 
 
 if __name__ == '__main__':
