@@ -10,7 +10,7 @@ vCPU - 8
 
 ## Дерево model репозитория
 
-    triton/model_repository
+    docker/model_repository
     └── model
         └── 1
 
