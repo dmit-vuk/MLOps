@@ -5,6 +5,7 @@ import numpy as np
 import onnx
 import pandas as pd
 import torch
+from dvc import api
 from hydra import compose, initialize
 from torch import nn
 from torch.utils.data import DataLoader
@@ -55,6 +56,9 @@ def evaluate(dataloader: DataLoader, model: nn.Module) -> Tuple[float]:
 
 
 def infer_model():
+    url = 'https://github.com/dmit-vuk/MLOps'
+    fs = api.DVCFileSystem(url, rev='main')
+    fs.get("./MLOps/data", "./", recursive=True, download=True)
     initialize(version_base="1.3", config_path="../configs")
     config = compose("config.yaml")
 
@@ -75,6 +79,9 @@ def infer_model():
 
 
 def infer_model_onnx():
+    url = 'https://github.com/dmit-vuk/MLOps'
+    fs = api.DVCFileSystem(url, rev='main')
+    fs.get("./MLOps/data", "./", recursive=True, download=True)
     initialize(version_base="1.3", config_path="../configs")
     config = compose("config.yaml")
 
